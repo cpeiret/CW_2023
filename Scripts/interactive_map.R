@@ -50,9 +50,9 @@ leaflet() %>%
                                                   bringToFront = TRUE),
               popup = popupGraph(radar_charts_adults)
               ) %>% 
-  # # Add legend
-  # addLegend(data = access_adults, position = "bottomright",
-  #           pal = pal_1, values = ~score, opacity = 1) %>% 
+  # Add legend
+  addLegend(data = access_adults, position = "bottomright",
+            pal = pal_1, values = ~score, opacity = 1, title = 'Adults/Seniors') %>%
 
   
   # Add seniors index
@@ -65,9 +65,6 @@ leaflet() %>%
                                                   bringToFront = FALSE),
               popup = popupGraph(radar_charts_seniors)
               ) %>% 
-  # # Add legend
-  # addLegend(data = access_seniors, position = "bottomright",
-  #           pal = pal_2, values = ~score, opacity = 1) %>% 
 
   
   # Add children index
@@ -81,25 +78,27 @@ leaflet() %>%
               popup = popupGraph(radar_charts_children)
   ) %>% 
   
-  # # Add legend
-  # addLegend(data = access_children, position = "bottomright",
-  #           pal = pal_3, values = ~score, opacity = 1,
-  #           ) %>% 
+  # Add legend
+  addLegend(data = access_children, position = "bottomright",
+            pal = pal_3, values = ~score, opacity = 1, title = 'Children'
+            ) %>%
   
   # Add layer control
   addLayersControl(baseGroups = c('Index adults','Index seniors', 'Index children'))
 
 
-
 # Test map ----------------------------------------------------------------
-pal_1 <- colorBin("viridis", domain = access_adults$score, bins = bins_1)
-
 
 leaflet() %>% 
   
+  # Add panes
+  addMapPane("left", zIndex = 0) %>%
+  addMapPane("right", zIndex = 0) %>%
+  
   # Add basemap
   addProviderTiles(providers$CartoDB.Positron,
-                   layerId = 'baseid_1') %>%
+                   layerId = 'baseid_1',
+                   options = pathOptions(pane = 'right')) %>%
   
   # Add adults index
   addPolygons(data = access_adults,
@@ -108,15 +107,64 @@ leaflet() %>%
               opacity = 1.0, fillOpacity = 1,
               fillColor = ~pal_1(score),
               highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                  bringToFront = TRUE)
+                                                  bringToFront = TRUE),
+              options = pathOptions(pane = 'right')
+              ) %>% 
+
+  
+  # Add seniors index
+  addPolygons(data = access_seniors,
+              group = 'Index seniors',
+              color = "#444444", weight = 1, smoothFactor = 0.5,
+              opacity = 1.0, fillOpacity = 1,
+              fillColor = ~pal_2(score),
+              highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                  bringToFront = FALSE),
+              options = pathOptions(pane = 'left')
+              ) %>% 
+  # Add layer control
+  addLayersControl(overlayGroups = c('Index adults','Index seniors')) %>% 
+  
+  addSidebyside(layerId = "sidecontrols",
+                rightId = "right",
+                leftId = "left")
+  
+
+
+# Slider map --------------------------------------------------------------
+
+leaflet() %>%
+  addMapPane("left", zIndex = 0) %>%
+  addMapPane("right", zIndex = 0) %>%
+  addProviderTiles(providers$CartoDB.Positron, group="carto", layerId = "baseid",
+                   options = pathOptions(pane = "right")) %>%
+  addProviderTiles(providers$CartoDB.Positron, group="carto", layerId = "cartoid",
+                   options = pathOptions(pane = "left")) %>%
+  
+  addPolygons(data = access_adults,
+              group = 'Index adults',
+              color = "#444444", weight = 1, smoothFactor = 0.5,
+              opacity = 1.0, fillOpacity = 1,
+              fillColor = ~pal_2(score),
+              highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                  bringToFront = FALSE),
+              options = pathOptions(pane = 'left')
   ) %>% 
-  # Add legend
-  addLegend(data = access_children, position = "bottomright",
-            pal = pal_1, values = ~score, opacity = 1,
-  )
   
   
-
-
-
+  
+  addPolygons(data = access_seniors,
+              group = 'Index seniors',
+              color = "#444444", weight = 1, smoothFactor = 0.5,
+              opacity = 1.0, fillOpacity = 1,
+              fillColor = ~pal_2(score),
+              highlightOptions = highlightOptions(color = "white", weight = 2,
+                                                  bringToFront = FALSE),
+              options = pathOptions(pane = 'right')
+  ) %>% 
+  
+  # addLayersControl(overlayGroups = c("Index adults","Index seniors")) %>%
+  addSidebyside(layerId = "sidecontrols",
+                rightId = "baseid",
+                leftId = "baseid")
 
