@@ -132,9 +132,9 @@ leaflet() %>%
                                                   bringToFront = TRUE),
               popup = popupGraph(radar_charts_adults)
               ) %>% 
-  # Add legend
-  addLegend(data = access_adults, position = "bottomright", group = 'Index adults',
-            pal = pal_1, values = ~score, opacity = 1, title = 'Adults') %>%
+  # # Add legend
+  # addLegend(data = access_adults, position = "bottomright", group = 'Index adults',
+  #           pal = pal_1, values = ~score, opacity = 1, title = 'Adults') %>%
 
   
   # Add seniors index
@@ -147,9 +147,9 @@ leaflet() %>%
                                                   bringToFront = FALSE),
               popup = popupGraph(radar_charts_seniors)
               ) %>% 
-  # Add legend
-  addLegend(data = access_adults, position = "bottomright", group = 'Index seniors',
-            pal = pal_1, values = ~score, opacity = 1, title = 'Seniors') %>%
+  # # Add legend
+  # addLegend(data = access_adults, position = "bottomright", group = 'Index seniors',
+  #           pal = pal_1, values = ~score, opacity = 1, title = 'Seniors') %>%
   
 
   
@@ -164,10 +164,10 @@ leaflet() %>%
               popup = popupGraph(radar_charts_children)
   ) %>% 
   
-  # Add legend
-  addLegend(data = access_children, position = "bottomright", group = 'Index children',
-            pal = pal_3, values = ~score, opacity = 1, title = 'Children'
-            ) %>%
+  # # Add legend
+  # addLegend(data = access_children, position = "bottomright", group = 'Index children',
+  #           pal = pal_3, values = ~score, opacity = 1, title = 'Children'
+  #           ) %>%
   
   # Add layer control
   addLayersControl(baseGroups = c('Index adults','Index seniors', 'Index children'),
