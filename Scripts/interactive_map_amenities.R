@@ -33,13 +33,61 @@ for (i in 1:length(urls)) {
 names(amenities) <- c('atms','cinemas','parks','pharmacies','pitches','playgrounds',
                       'schools','supermarkets')
 
-
+test <- amenities$atms
 
 # Plot maps ---------------------------------------------------------------
 
+leaflet() %>% 
+  # Add basemap
+  addProviderTiles(providers$CartoDB.Positron,
+                   layerId = 'baseid_1') %>% 
+  
+  # Add atms
+  addCircleMarkers(data = st_centroid(amenities$atms),
+             group = 'ATMs',
+             radius = 5,
+             clusterOptions = markerClusterOptions()) %>% 
+  
+  # Add cinemas
+  addCircleMarkers(data = st_centroid(amenities$cinemas),
+             group = 'Cinemas',
+             radius = 5,
+             clusterOptions = markerClusterOptions()) %>%
 
-
-
-
-
+  # Add parks
+  addCircleMarkers(data = st_centroid(st_make_valid(amenities$parks)),
+                   group = 'Parks',
+                   radius = 5,
+                   clusterOptions = markerClusterOptions()) %>%
+  # Add Pharmacies
+  addCircleMarkers(data = st_centroid(amenities$pharmacies),
+                   group = 'Pharmacies',
+                   radius = 5,
+                   clusterOptions = markerClusterOptions()) %>%
+  # Add pitches
+  addCircleMarkers(data = st_centroid(amenities$pitches),
+                   group = 'Pitches',
+                   radius = 5,
+                   clusterOptions = markerClusterOptions()) %>%
+  # Add playgrounds
+  addCircleMarkers(data = st_centroid(st_make_valid(amenities$playgrounds)),
+                   group = 'Playgrounds',
+                   radius = 5,
+                   clusterOptions = markerClusterOptions()) %>%
+  # Add schools
+  addCircleMarkers(data = st_centroid(st_make_valid(amenities$schools)),
+                   group = 'Schools',
+                   radius = 5,
+                   clusterOptions = markerClusterOptions()) %>%
+  # Add supermarkets
+  addCircleMarkers(data = st_centroid(st_make_valid(amenities$supermarkets)),
+                   group = 'Supermarkets',
+                   radius = 5,
+                   clusterOptions = markerClusterOptions()) %>%
+  
+  # Add layer control
+  addLayersControl(baseGroups = c('ATMs','Cinemas','Parks','Pharmacies',
+                                  'Pitches','Playgrounds','Schools',
+                                  'Supermarkets'),
+                   options = layersControlOptions(collapsed = FALSE))
 
