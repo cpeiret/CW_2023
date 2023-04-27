@@ -14,31 +14,30 @@ library(leaflet.extras2)
 
 # Data --------------------------------------------------------------------
 
-url_1 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_adults_lsoa.geojson'
+url_1 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_adults_buildings_small.geojson'
 access_adults <- st_read(url_1) %>% 
   st_drop_geometry()
 
-url_2 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_seniors_lsoa.geojson'
+url_2 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_seniors_buildings.geojson'
 access_seniors <- st_read(url_2) %>% 
   st_drop_geometry()
 
-url_3 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_children_lsoa.geojson'
+url_3 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_children_buildings_small.geojson'
 access_children <- st_read(url_3) %>% 
   st_drop_geometry()
-
-
+ 
 
 # Spider charts for adults ------------------------------------------------
 
 # Get max and min values
-columns <- colnames(access_adults[2:8])
+columns <- colnames(access_adults[3:9])
 max_values <- apply(access_adults[, columns], 2, max)
 min_values <- apply(access_adults[, columns], 2, min)
 
 radar_charts_adults <- list()
 
 for (i in 1:nrow(access_adults)) {
-  df <- rbind(max_values, min_values, access_adults[i,][2:8])
+  df <- rbind(max_values, min_values, access_adults[i,][3:9])
   radarchart(df,
              # Customize the polygon
              pcol = '#00AFBB', pfcol = scales::alpha('#00AFBB', 0.5), plwd = 2, plty = 1,
@@ -49,39 +48,17 @@ for (i in 1:nrow(access_adults)) {
   radar_charts_adults[[i]] <- recordPlot()
 }
 
-
-# Spider charts for seniors ------------------------------------------------
-
-# Get max and min values
-columns <- colnames(access_seniors[2:8])
-max_values <- apply(access_seniors[, columns], 2, max)
-min_values <- apply(access_seniors[, columns], 2, min)
-
-radar_charts_seniors <- list()
-
-for (i in 1:nrow(access_seniors)) {
-  df <- rbind(max_values, min_values, access_seniors[i,][2:8])
-  radarchart(df,
-             # Customize the polygon
-             pcol = '#00AFBB', pfcol = scales::alpha('#00AFBB', 0.5), plwd = 2, plty = 1,
-             # Customize the grid
-             cglcol = "grey", cglty = 1, cglwd = 0.8,
-             # Customize the axis
-             axislabcol = "grey")
-  radar_charts_seniors[[i]] <- recordPlot()
-}
-
 # Spider charts for children ------------------------------------------------
 
 # Get max and min values
-columns <- colnames(access_children[2:5])
+columns <- colnames(access_children[3:6])
 max_values <- apply(access_children[, columns], 2, max)
 min_values <- apply(access_children[, columns], 2, min)
 
 radar_charts_children <- list()
 
 for (i in 1:nrow(access_children)) {
-  df <- rbind(max_values, min_values, access_children[i,][2:5])
+  df <- rbind(max_values, min_values, access_children[i,][3:6])
   radarchart(df,
              # Customize the polygon
              pcol = '#00AFBB', pfcol = scales::alpha('#00AFBB', 0.5), plwd = 2, plty = 1,
@@ -92,18 +69,20 @@ for (i in 1:nrow(access_children)) {
   radar_charts_children[[i]] <- recordPlot()
 }
 
-
-
 # Data --------------------------------------------------------------------
 
-url_1 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_adults_lsoa.geojson'
+url_1 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_adults_buildings_small.geojson'
 access_adults <- st_read(url_1)
 
-url_2 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_seniors_lsoa.geojson'
+url_2 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_seniors_buildings.geojson'
 access_seniors <- st_read(url_2)
 
-url_3 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_children_lsoa.geojson'
+url_3 <- 'https://raw.githubusercontent.com/cpeiret/CW_2023/main/Data/index_children_buildings_small.geojson'
 access_children <- st_read(url_3)
+
+access_adults <- access_adults[!st_geometry_type(access_adults$geometry) == 'POINT',]
+access_seniors <- access_adults[!st_geometry_type(access_seniors$geometry) == 'POINT',]
+access_children <- access_children[!st_geometry_type(access_children$geometry) == 'POINT',]
 
 
 # Multi-layer map with pop-up spider chart ------------------------------------
@@ -115,62 +94,37 @@ pal_1 <- colorBin("RdYlGn", domain = access_adults$score, bins = bins_1)
 pal_2 <- colorBin("RdYlGn", domain = access_seniors$score, bins = bins_2)
 pal_3 <- colorBin("RdYlGn", domain = access_children$score, bins = bins_3)
 
+# Regular map -------------------------------------------------------------
 
 leaflet() %>% 
   
   # Add basemap
-  addProviderTiles(providers$CartoDB.Positron,
+  addProviderTiles(providers$CartoDB.DarkMatter,
                    layerId = 'baseid_1') %>%
   
   # Add adults index
   addPolygons(data = access_adults,
               group = 'Index adults',
-              color = "#444444", weight = 1, smoothFactor = 0.5,
+              color = NA, weight = 1, smoothFactor = 0.5,
               opacity = 1.0, fillOpacity = 1,
               fillColor = ~pal_1(score),
               highlightOptions = highlightOptions(color = "white", weight = 2,
                                                   bringToFront = TRUE),
               popup = popupGraph(radar_charts_adults)
-              ) %>% 
-  # Add legend
-  addLegend(data = access_adults, position = "bottomright", group = 'Index adults',
-            pal = pal_1, values = ~score, opacity = 1, title = 'Adults') %>%
-
-  
-  # Add seniors index
-  addPolygons(data = access_seniors,
-              group = 'Index seniors',
-              color = "#444444", weight = 1, smoothFactor = 0.5,
-              opacity = 1.0, fillOpacity = 1,
-              fillColor = ~pal_2(score),
-              highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                  bringToFront = FALSE),
-              popup = popupGraph(radar_charts_seniors)
-              ) %>% 
-  # Add legend
-  addLegend(data = access_adults, position = "bottomright", group = 'Index seniors',
-            pal = pal_1, values = ~score, opacity = 1, title = 'Seniors') %>%
-  
-
+  ) %>% 
   
   # Add children index
   addPolygons(data = access_children,
               group = 'Index children',
-              color = "#444444", weight = 1, smoothFactor = 0.5,
+              color = NA, weight = 1, smoothFactor = 0.5,
               opacity = 1.0, fillOpacity = 1,
-              fillColor = ~pal_3(score),
+              fillColor = ~pal_1(score),
               highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                  bringToFront = FALSE),
+                                                  bringToFront = TRUE),
               popup = popupGraph(radar_charts_children)
-  ) %>% 
-  
-  # Add legend
-  addLegend(data = access_children, position = "bottomright", group = 'Index children',
-            pal = pal_3, values = ~score, opacity = 1, title = 'Children'
-            ) %>%
-  
+              ) %>% 
   # Add layer control
-  addLayersControl(baseGroups = c('Index adults','Index seniors', 'Index children'),
+  addLayersControl(baseGroups = c('Index adults', 'Index children'),
                    options = layersControlOptions(collapsed = FALSE))
 
 
@@ -179,14 +133,14 @@ leaflet() %>%
 leaflet() %>%
   addMapPane("left", zIndex = 0) %>%
   addMapPane("right", zIndex = 0) %>%
-  addProviderTiles(providers$CartoDB.Positron, group="carto", layerId = "baseid",
+  addProviderTiles(providers$CartoDB.DarkMatter, group="carto", layerId = "baseid",
                    options = pathOptions(pane = "right")) %>%
-  addProviderTiles(providers$CartoDB.Positron, group="carto", layerId = "cartoid",
+  addProviderTiles(providers$CartoDB.DarkMatter, group="carto", layerId = "cartoid",
                    options = pathOptions(pane = "left")) %>%
   
   addPolygons(data = access_adults,
               group = 'Index adults',
-              color = "#444444", weight = 1, smoothFactor = 0.5,
+              color = NA, weight = 1, smoothFactor = 0.5,
               opacity = 1.0, fillOpacity = 1,
               fillColor = ~pal_2(score),
               highlightOptions = highlightOptions(color = "white", weight = 2,
@@ -195,9 +149,9 @@ leaflet() %>%
   ) %>% 
   
   
-  addPolygons(data = access_seniors,
-              group = 'Index seniors',
-              color = "#444444", weight = 1, smoothFactor = 0.5,
+  addPolygons(data = access_children,
+              group = 'Index children',
+              color = NA, weight = 1, smoothFactor = 0.5,
               opacity = 1.0, fillOpacity = 1,
               fillColor = ~pal_2(score),
               highlightOptions = highlightOptions(color = "white", weight = 2,
@@ -205,9 +159,10 @@ leaflet() %>%
               options = pathOptions(pane = 'right')
   ) %>% 
   
-  # addLayersControl(overlayGroups = c("Index adults","Index seniors")) %>%
+  # addLayersControl(overlayGroups = c("Index adults","Index children")) %>%
   addSidebyside(layerId = "sidecontrols",
                 rightId = "baseid",
                 leftId = "baseid")
+
 
 
