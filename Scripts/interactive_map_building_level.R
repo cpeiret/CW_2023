@@ -110,7 +110,7 @@ leaflet() %>%
               fillColor = ~pal_1(score),
               highlightOptions = highlightOptions(color = "white", weight = 2,
                                                   bringToFront = TRUE),
-              popup = popupGraph(radar_charts_adults)
+              
   ) %>% 
   
   # Add children index
@@ -120,8 +120,7 @@ leaflet() %>%
               opacity = 1.0, fillOpacity = 1,
               fillColor = ~pal_1(score),
               highlightOptions = highlightOptions(color = "white", weight = 2,
-                                                  bringToFront = TRUE),
-              popup = popupGraph(radar_charts_children)
+                                                  bringToFront = TRUE)
               ) %>% 
   # Add layer control
   addLayersControl(baseGroups = c('Index adults', 'Index children'),
